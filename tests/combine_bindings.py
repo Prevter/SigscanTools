@@ -1,7 +1,7 @@
 OPTIONS = {
-    'ida_export': 'funcs_dump_m12206.tsv',
-    'found_bindings': 'MacOS-2.206-Arm.txt',
-    'output': 'funcs2206-m1.csv',
+    'ida_export': 'funcs_dump_m122073.tsv',
+    'found_bindings': 'MacOS-2.2073-Arm.txt',
+    'output': 'funcs22073-m1.csv',
     'base': 0x100000000
 }
 
@@ -51,8 +51,7 @@ for line in lines:
         for func in funcs:
             # Check if the offset matches
             if func.offset == offset:
-                func.name = name
-                newFuncs.append(func)
+                newFuncs.append(Function(name, offset, func.size))
                 break
 
 # Sort by offset

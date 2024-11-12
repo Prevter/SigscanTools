@@ -15,7 +15,9 @@ private:
 
     DEFINE_OP(add);
     DEFINE_OP(adrp);
+    DEFINE_OP(b);
     DEFINE_OP(bl);
+    DEFINE_OP(blr);
     DEFINE_OP(cbz);
     DEFINE_OP(cmp);
     DEFINE_OP(ldp);
@@ -24,6 +26,7 @@ private:
     DEFINE_OP(ret);
     DEFINE_OP(stp);
     DEFINE_OP(str);
+    DEFINE_OP(strb);
     DEFINE_OP(sub);
 
 #undef DEFINE_OP

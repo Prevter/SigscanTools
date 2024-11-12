@@ -10,7 +10,9 @@ std::vector<PatternToken> ArmGenerator::getPattern(std::vector<uint8_t> const &b
     static std::unordered_map<std::string_view, std::vector<PatternToken> (*)(std::vector<uint8_t> const &, cs_arm64 const &)> const instructions = {
         {"add",  add},
         {"adrp", adrp},
+        {"b",    b},
         {"bl",   bl},
+        {"blr",  blr},
         {"cbz",  cbz},
         {"cmp",  cmp},
         {"ldp",  ldp},
@@ -19,6 +21,7 @@ std::vector<PatternToken> ArmGenerator::getPattern(std::vector<uint8_t> const &b
         {"ret",  ret},
         {"stp",  stp},
         {"str",  str},
+        {"strb", strb},
         {"sub",  sub},
     };
 
@@ -28,7 +31,7 @@ std::vector<PatternToken> ArmGenerator::getPattern(std::vector<uint8_t> const &b
 
     // we don't know what this is, so just wildcard it
     IDK:
-    std::cout << std::format("Unknown instruction: {}\n", text);
+    // std::cout << std::format("Unknown instruction: {}\n", text);
     std::vector<PatternToken> pattern;
     pattern.reserve(bytes.size());
     for (size_t i = 0; i < bytes.size(); i++) {
@@ -61,12 +64,30 @@ std::vector<PatternToken> ArmGenerator::adrp(std::vector<uint8_t> const &bytes, 
     };
 }
 
+std::vector<PatternToken> ArmGenerator::b(std::vector<uint8_t> const &bytes, cs_arm64 const &data) {
+    return {
+        PatternToken::wildcard(),
+        PatternToken::wildcard(),
+        PatternToken::wildcard(),
+        PatternToken::fromByteMask(bytes[3], 0b11111100),
+    };
+}
+
 std::vector<PatternToken> ArmGenerator::bl(std::vector<uint8_t> const &bytes, cs_arm64 const &data) {
     return {
         PatternToken::wildcard(),
         PatternToken::wildcard(),
         PatternToken::wildcard(),
-        PatternToken::fromByteMask(bytes[3], 0b00000111),
+        PatternToken::fromByteMask(bytes[3], 0b11111100),
+    };
+}
+
+std::vector<PatternToken> ArmGenerator::blr(std::vector<uint8_t> const &bytes, cs_arm64 const &data) {
+    return {
+        PatternToken::fromByteMask(bytes[0], 0b00011111),
+        PatternToken::fromByteMask(bytes[1], 0b11111100),
+        PatternToken::fromByte(bytes[2]),
+        PatternToken::fromByte(bytes[3]),
     };
 }
 
@@ -146,6 +167,17 @@ std::vector<PatternToken> ArmGenerator::str(std::vector<uint8_t> const &bytes, c
         PatternToken::wildcard(),
         PatternToken::wildcard(),
         PatternToken::fromByteMask(bytes[2], 0b11000000),
+        PatternToken::fromByte(bytes[3]),
+    };
+}
+
+std::vector<PatternToken> ArmGenerator::strb(std::vector<uint8_t> const &bytes, cs_arm64 const &data) {
+    // STRB (imm) 0b11111111 0b11111111 0b11111100 0b00000000
+    // STRB (reg) 0b11111111 0b11100000 0b11111100 0b00000000
+    return {
+        PatternToken::wildcard(),
+        PatternToken::fromByteMask(bytes[1], 0b11111100),
+        PatternToken::fromByteMask(bytes[2], 0b11100000),
         PatternToken::fromByte(bytes[3]),
     };
 }

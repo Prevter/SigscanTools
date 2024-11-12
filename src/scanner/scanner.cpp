@@ -144,10 +144,11 @@ std::string Scanner::generateUniquePattern(uintptr_t address, size_t maxLength) 
     return patternString;
 }
 
-std::vector<uint8_t> Scanner::getSubArray(uintptr_t address, size_t length) const {
-    std::vector<uint8_t> subArray;
-    for (size_t i = address + baseAddress; i < address + baseAddress + length; i++) {
-        subArray.push_back(binary[i]);
-    }
-    return subArray;
+std::span<uint8_t> Scanner::getSubArray(uintptr_t address, size_t length) const {
+    uintptr_t start = address + baseAddress;
+    if (start >= binary.size()) return {};
+    return {
+        const_cast<uint8_t*>(binary.data()) + start,
+        std::min(length, binary.size() - start)
+    };
 }

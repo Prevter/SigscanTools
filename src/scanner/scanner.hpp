@@ -59,7 +59,7 @@ public:
     bool find(std::string_view pattern, std::vector<uintptr_t>& results) const;
     bool find(std::string_view pattern, uintptr_t& result) const;
 
-    [[nodiscard]] std::vector<uint8_t> getSubArray(uintptr_t address, size_t length) const;
+    [[nodiscard]] std::span<uint8_t> getSubArray(uintptr_t address, size_t length) const;
 
     [[nodiscard]] std::string generateUniquePattern(uintptr_t address, size_t maxLength) const;
 
